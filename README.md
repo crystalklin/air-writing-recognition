@@ -46,8 +46,8 @@ Explain how to run the automated tests for this system -->
 
 ## Authors
 
-* **Michelle Jin**  [Github - mjin8](https://github.com/mjin8/)
-* **Crystal Lin**   [Github - heycrystal](https://github.com/heycrystal/)
+* **Michelle Jin** - [_mjin8_](https://github.com/mjin8/)
+* **Crystal Lin** - [_heycrystal_](https://github.com/heycrystal/)
 
 ## License
 
