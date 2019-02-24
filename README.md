@@ -16,11 +16,14 @@ Packages:
 * OpenCV
 * imutils
 * numpy
+* scikit-image
+
 
 ```
 pip install opencv-python
 pip install imutils
 pip install numpy
+pip install scikit-image
 ```
 
 <!-- ### Installation
