@@ -24,8 +24,15 @@ args = vars(ap.parse_args())
 # list of tracked points
 greenLower = (29, 86, 6)
 greenUpper = (64, 255, 255)
-pts = deque(maxlen=args["buffer"])
+#pts = deque(maxlen=args["buffer"])
+pts = deque(maxlen=512)
 # pts = []
+
+# Blackboard to overlay vector on?
+blackboard = np.zeros((480,640,3), dtype=np.uint8)
+
+# 5x5 kernel for erosion and dilation
+kernel = np.ones((5, 5), np.uint8)
 
 # if a video path was not supplied, grab the reference
 # to the webcam
@@ -59,10 +66,14 @@ while True:
     frame = imutils.resize(frame, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # construct a mask for the color "green", then perform
     # a series of dilations and erosions to remove any small
     # blobs left in the mask
+    '''
+    Leaving as is for now and will maybe update if results aren't good. 
+    '''
     mask = cv2.inRange(hsv, greenLower, greenUpper)
     mask = cv2.erode(mask, None, iterations=2)
     mask = cv2.dilate(mask, None, iterations=2)
@@ -92,9 +103,27 @@ while True:
                 (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
-    # update the points queue
-    pts.appendleft(center)
-    # pts.append(center)
+        # update the points queue
+        pts.appendleft(center)
+        # pts.append(center)
+    elif len(cnts) == 0:
+        if len(pts) > 0:
+            blackboard_gray = cv2.cvtColor(blackboard, cv2.COLOR_BGR2GRAY)
+            blur1 = cv2.medianBlur(blackboard_gray, 15)
+            blur1 = cv2.GaussianBlur(blur1, (5, 5), 0)
+            thresh1 = cv2.threshold(blur1, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+            # Finding contours on the blackboard
+            b_cnts = cv2.findContours(thresh1.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[1]
+            if len(b_cnts) > 0:
+                cnt = sorted(blackboard_cnts, key = cv2.contourArea, reverse = True)[0]
+                if cv2.contourArea(cnt) > 1000:
+                    x, y, w, h = cv2.boundingRect(cnt)
+                    character = blackboard_gray[y-10:y + h + 10, x-10:x + w + 10]
+                    newImage = cv2.resize(alphabet, (28, 28))
+                    newImage = np.array(newImage)
+                    newImage = newImage.astype('float32')/255
+                    
+                    # make predictions here
 
     # loop over the set of tracked points
     for i in range(point_index, len(pts)):

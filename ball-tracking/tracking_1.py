@@ -24,8 +24,15 @@ args = vars(ap.parse_args())
 # list of tracked points
 greenLower = (29, 86, 6)
 greenUpper = (64, 255, 255)
-pts = deque(maxlen=args["buffer"])
-all_pts = []
+#pts = deque(maxlen=args["buffer"])
+pts = deque(maxlen=512)
+# pts = []
+
+# Blackboard to overlay vector on?
+blackboard = np.zeros((480,640,3), dtype=np.uint8)
+
+# 5x5 kernel for erosion and dilation
+kernel = np.ones((5, 5), np.uint8)
 
 # if a video path was not supplied, grab the reference
 # to the webcam
@@ -38,6 +45,8 @@ else:
 
 # allow the camera or video file to warm up
 time.sleep(2.0)
+
+point_index = 1
 
 # keep looping
 while True:
@@ -57,12 +66,14 @@ while True:
     frame = imutils.resize(frame, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     # construct a mask for the color "green", then perform
     # a series of dilations and erosions to remove any small
     # blobs left in the mask
     mask = cv2.inRange(hsv, greenLower, greenUpper)
     mask = cv2.erode(mask, None, iterations=2)
+    #mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     mask = cv2.dilate(mask, None, iterations=2)
 
     # find contours in the mask and initialize the current
@@ -89,31 +100,35 @@ while True:
             cv2.circle(frame, (int(x), int(y)), int(radius),
                 (0, 255, 255), 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
-        
+
     # update the points queue
     pts.appendleft(center)
-    all_pts.append(center)
+    # pts.append(center)
 
     # loop over the set of tracked points
-    for i in range(1, len(pts)):
+    for i in range(point_index, len(pts)):
         # if either of the tracked points are None, ignore
         # them
         if pts[i - 1] is None or pts[i] is None:
             continue
-
+                
+        # print ("frame: ", pts[i])
         # otherwise, compute the thickness of the line and
         # draw the connecting lines
         thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
         cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 
     # show the frame to our screen
+    # print ("printing frame")
     cv2.imshow("Frame", frame)
     key = cv2.waitKey(1) & 0xFF
 
     # if the 'q' key is pressed, stop the loop
     if key == ord("q"):
         break
-print ("SAVED POINTS", all_pts)
+
+print (pts)
+
 # if we are not using a video file, stop the camera video stream
 if not args.get("video", False):
     vs.stop()
