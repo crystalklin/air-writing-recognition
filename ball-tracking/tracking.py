@@ -107,15 +107,17 @@ while True:
         pts.appendleft(center)
         # pts.append(center)
     elif len(cnts) == 0:
-        if len(pts) > 0:
+        if len(pts) != 0:
             blackboard_gray = cv2.cvtColor(blackboard, cv2.COLOR_BGR2GRAY)
             blur1 = cv2.medianBlur(blackboard_gray, 15)
             blur1 = cv2.GaussianBlur(blur1, (5, 5), 0)
             thresh1 = cv2.threshold(blur1, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
             # Finding contours on the blackboard
-            b_cnts = cv2.findContours(thresh1.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[1]
-            if len(b_cnts) > 0:
-                cnt = sorted(blackboard_cnts, key = cv2.contourArea, reverse = True)[0]
+            print ("THRESH")
+            print (thresh1)
+            blackboard_cnts = cv2.findContours(thresh1.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[1]
+            if len(blackboard_cnts) > 0:
+                cnt = sorted(blackboard_cnts, key = cv2.contourArea(), reverse = True)[0]
                 if cv2.contourArea(cnt) > 1000:
                     x, y, w, h = cv2.boundingRect(cnt)
                     character = blackboard_gray[y-10:y + h + 10, x-10:x + w + 10]
@@ -123,20 +125,28 @@ while True:
                     newImage = np.array(newImage)
                     newImage = newImage.astype('float32')/255
                     
-                    # make predictions here
+            # make predictions here
+            pts = deque(maxlen=512)
+            blackboard = np.zeros((480, 640, 3), dtype=np.uint8)
 
     # loop over the set of tracked points
-    for i in range(point_index, len(pts)):
-        # if either of the tracked points are None, ignore
-        # them
+    for i in range(1, len(pts)):
         if pts[i - 1] is None or pts[i] is None:
             continue
-                
-        # print ("frame: ", pts[i])
-        # otherwise, compute the thickness of the line and
-        # draw the connecting lines
-        thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
-        cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+        cv2.line(frame, pts[i - 1], pts[i], (0, 0, 0), 2)
+        cv2.line(blackboard, pts[i - 1], pts[i], (255, 255, 255), 8)
+
+    #for i in range(point_index, len(pts)):
+    #    # if either of the tracked points are None, ignore
+    #    # them
+    #    if pts[i - 1] is None or pts[i] is None:
+    #        continue
+    #            
+    #    # print ("frame: ", pts[i])
+    #    # otherwise, compute the thickness of the line and
+    #    # draw the connecting lines
+    #    thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
+    #    cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 
     # show the frame to our screen
     # print ("printing frame")
@@ -147,7 +157,7 @@ while True:
     if key == ord("q"):
         break
 
-print (pts)
+#print (pts)
 
 # if we are not using a video file, stop the camera video stream
 if not args.get("video", False):
