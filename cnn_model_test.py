@@ -11,6 +11,7 @@ import cv2
 import argparse
 import os.path
 
+args = None
 def load_model():
     # Load trained model
     if args.verbose:
