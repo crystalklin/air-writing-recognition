@@ -172,16 +172,16 @@ while True:
     mirrored_board = cv2.flip(blackboard, 1)
     cv2.imshow("Blackboard", mirrored_board)
     
-    cv2.imwrite("blackboardimage.png", mirrored_board)
+    #cv2.imwrite("blackboardimage.png", mirrored_board)
     blackboard_gray = cv2.cvtColor(mirrored_board, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite("blackboard_gray_image.png", blackboard_gray)
+    #cv2.imwrite("blackboard_gray_image.png", blackboard_gray)
     blur1 = cv2.medianBlur(blackboard_gray, 15)
     blur1 = cv2.GaussianBlur(blur1, (5, 5), 0)
-    cv2.imwrite("blurredimage.png", blur1)
+    #cv2.imwrite("blurredimage.png", blur1)
     ret, thresh = cv2.threshold(blur1, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
     # Finding contours on the blackboard
     blackboard_img, blackboard_cnts, blackboard_hier = cv2.findContours(thresh.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-    cv2.imwrite("contourblackboard.png", blackboard_img)
+    #cv2.imwrite("contourblackboard.png", blackboard_img)
     if len(blackboard_cnts) > 0:
         cnt = sorted(blackboard_cnts, key = cv2.contourArea, reverse = True)[0]
         if cv2.contourArea(cnt) > 1000:
@@ -191,11 +191,6 @@ while True:
             
             path = 'input_images/'
             cv2.imwrite(os.path.join(path, "img-%d.png"%count), newImage)
-            
-            # how to pass image as input into classification model
-            #newImage = np.array(newImage)
-            #newImage = newImage.astype('float32')/255
-
             
     
     key = cv2.waitKey(1) & 0xFF
