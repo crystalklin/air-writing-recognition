@@ -50,6 +50,23 @@ time.sleep(2.0)
 
 point_index = 1
 
+def update_depth(obj_width, focal_len, width):
+    obj_depth = 0
+    if width == 0:
+        return obj_depth, 0
+    elif obj_width == 0 or focal_len == 0:
+        return obj_depth, 0
+    else:
+        obj_depth = obj_width * focal_len / width
+        #print("Width: ", width)
+        #print("Calculating depth...")
+        #print("Depth: ", obj_depth, "  delta: ", obj_depth-focal_len)
+    return obj_depth, obj_depth-focal_len
+
+obj_width = 0
+focal_len = 0
+obj_depth = 0
+
 # keep looping
 while True:
     # grab the current frame
@@ -87,6 +104,8 @@ while True:
     cnts = imutils.grab_contours(cnts)
     center = None
 
+    do_save = False
+    
     # only proceed if at least one contour was found
     if len(cnts) > 0:
         # find the largest contour in the mask, then use
@@ -99,14 +118,42 @@ while True:
 
         # only proceed if the radius meets a minimum size
         if radius > 10:
+            
+            # recalculate
+            width = 2*radius
+            
+            # need to update parameters from zero value
+            obj_depth, delta = update_depth(obj_width, focal_len, width)
+
+            print ("delta : ", delta)
+            
+            if delta > 1 or delta < -3:
+                circle_status = (0, 10, 255) # too far/close, red
+            elif delta > 0.5 or delta < -2:
+                circle_status = (0, 255, 255) # too close, yellow
+            else:
+                circle_status = (10, 255, 10) # on plane, green
+                do_save = True
+
             # draw the circle and centroid on the frame,
             # then update the list of tracked points
-            cv2.circle(frame, (int(x), int(y)), int(radius),
-                (0, 255, 255), 2)
+            cv2.circle(frame, (int(x), int(y)), int(radius), circle_status, 2)
             cv2.circle(frame, center, 5, (0, 0, 255), -1)
 
-        # update the points queue
-        pts.appendleft(center)
+            # draw the circle and centroid on the frame,
+            # then update the list of tracked points
+            #cv2.circle(frame, (int(x), int(y)), int(radius),
+            #    (0, 255, 255), 2)
+            #cv2.circle(frame, center, 5, (0, 0, 255), -1)
+
+        # update the points queue only if it is the correct depth
+        
+        print (do_save)
+        # if false then empty deque so that it doesn't try to connect the last line? 
+        if do_save:
+            pts.appendleft(center)
+        else:
+            pts = deque(maxlen=512)
         # pts.append(center)
     elif len(cnts) == 0:
         if len(pts) != 0:
@@ -153,15 +200,31 @@ while True:
     #    cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
 
     # show the frame to our screen
-    #cv2.imshow("Frame", frame)
-    cv2.imshow("Blackboard", blackboard)
+    cv2.imshow("Frame", frame)
+    mirrored_board = blackboard.copy()
+    mirrored_board = cv2.flip(blackboard, 1)
+    cv2.imshow("Blackboard", mirrored_board)
     key = cv2.waitKey(1) & 0xFF
 
     # if the 'q' key is pressed, stop the loop
     if key == ord("q"):
         break
 
-#print (pts)
+    # if the 's' key is pressed, consider this the "start size"
+    if key == ord("s"):
+        obj_width = width
+        focal_len = 10
+        print("Tracker width: ", obj_width)
+        print("Whiteboard depth: ", focal_len)
+
+    if key == ord("c"):
+        if width == 0:
+            print("Can not find tracker.")
+        elif obj_width == 0 or focal_len == 0:
+            print("Whiteboard not yet set.")
+        else:
+            obj_depth = update_depth(obj_depth, focal_len, width)
+
 
 # if we are not using a video file, stop the camera video stream
 if not args.get("video", False):
