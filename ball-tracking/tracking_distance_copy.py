@@ -190,7 +190,7 @@ while True:
             newImage = cv2.resize(alphabet, (28, 28))
             
             path = 'input_images/'
-            cv2.imwrite(os.path.join(path, "img-%d.png"%count), newImage)
+            cv2.imwrite(os.path.join(path, "img%d.png"%count), newImage)
             
             # how to pass image as input into classification model
             #newImage = np.array(newImage)
@@ -213,10 +213,10 @@ while True:
         print("Whiteboard depth: ", focal_len)
 
     if key == ord("d"):
-        # save the image, erase blackboard, empty saved points queue, startover
-        count += 1 
-        blackboard = np.zeros((480, 640, 3), dtype=np.uint8)    
-        pts = deque(maxlen=512)
+        # save the image, erase blackboard, startover
+        # blackboard = np.zeros((480, 640, 3), dtype=np.uint8)    
+        cv2.imwrite("image.png", mirrored_blackboard)
+        pass
 
     if key == ord("c"):
         if width == 0:
