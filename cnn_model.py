@@ -135,7 +135,7 @@ history = model.fit(X_train, y_train,
             validation_data=(X_test, y_test))
 if args.verbose:
     print("...finished.")
-print(hist.history)
+#print(history.history)
 
 # Save trained model
 if args.verbose:

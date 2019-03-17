@@ -8,6 +8,11 @@ from sklearn.model_selection import train_test_split
 import numpy as np
 import cv2
 
+import pickle
+import json, codecs
+import matplotlib
+matplotlib.use("TKAgg")
+from matplotlib import pyplot as plt # plotting the history
 import argparse
 import os.path
 
@@ -127,28 +132,36 @@ def plot_model():
     # Load training history
     if args.verbose:
         print("Loading model history from disk.........", end="")
+    #with codecs.open('cnn_model_history.pckl', 'r', encoding='utf-8') as f:
+        #history = json.loads(f.read())
+    #history = new History()
     f = open('cnn_model_history.pckl', 'rb')
     history = pickle.load(f)
+    print(type(history))
+    print(history)
+    #print(history.history.keys())
     f.close()
     if args.verbose:
         print("...finished.")
 
-    # Summarize history for accuracy
-    plt.plot(history.history['acc'])
-    plt.plot(history.history['val_acc'])
-    plt.title('model accuracy')
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
+    # Plot accuracies
+    x_epoch = [1,2,3,4,5,6,7,8,9,10]
+    plt.plot(x_epoch, history['acc'])
+    plt.plot(x_epoch, history['val_acc'])
+    plt.title('Model Accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch Number')
+    plt.legend(['Training data', 'Evaluation data'], loc='upper left')
     plt.show()
 
-    # Summarize history for loss
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
+    # Plot loss
+    x_epoch = [1,2,3,4,5,6,7,8,9,10]
+    plt.plot(x_epoch, history['loss'])
+    plt.plot(x_epoch, history['val_loss'])
+    plt.title('Model Loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch Number')
+    plt.legend(['Training data', 'Evaluation data'], loc='upper left')
     plt.show()
 
 # https://stackoverflow.com/questions/11540854/file-as-command-line-argument-for-argparse-error-message-if-argument-is-not-va
@@ -200,18 +213,13 @@ if __name__ == "__main__":
         model = load_model()
         if args.test:
             test_model(model)
+            print(letters[int(predict_model(model, 'input_images/img-7.png'))])
         #if args.input:
-            # [0-9: digits][10-36: uppercase][37-62: lowercase]
+            # [0-9: digits][10-36: uppercase][37-62: lowercase
             #prediction = predict_model(model, args.input[0])
             #print(prediction)
             #print(letters[int(prediction)])
-    model = load_model()
-    print(letters[int(predict_model(model, 'input_images/img-0.png'))])
-    print(letters[int(predict_model(model, 'input_images/img-1.png'))])
-    print(letters[int(predict_model(model, 'input_images/img-2.png'))])
-    print(letters[int(predict_model(model, 'input_images/img-3.png'))])
-    print(letters[int(predict_model(model, 'input_images/img-4.png'))])
-    print(letters[int(predict_model(model, 'input_images/img-5.png'))])
+    
 
 
 
