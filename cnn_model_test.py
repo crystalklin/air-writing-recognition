@@ -24,18 +24,18 @@ def load_model():
 
     # Load JSON model
     if args.old:
-        json_file = open('cnn_model-0.json', 'r')
+        json_file = open('mode_saves/cnn_model-0.json', 'r')
     else:
-        json_file = open('cnn_model.json', 'r')
+        json_file = open('model_saves/cnn_model.json', 'r')
     model_json = json_file.read()
     json_file.close()
     model = model_from_json(model_json)
 
     # Load model weights
     if args.old:
-        model.load_weights("cnn_model_weights-0.h5")
+        model.load_weights("model_saves/cnn_model_weights-0.h5")
     else:
-        model.load_weights("cnn_model_weights.h5")
+        model.load_weights("model_saves/cnn_model_weights.h5")
     if args.verbose:
         print("...finished.")
     return model
@@ -53,49 +53,35 @@ def test_model(model):
 
     # Load EMNIST-byclass data
     if args.verbose:
-        print("Loading EMNIST byclass-training data....", end="")
+        print("Loading EMNIST byclass-testing data....", end="")
     emnist = MNIST(path='data', return_type='numpy')
     emnist.select_emnist('byclass')
-    X, y =  emnist.load_training()
+    X_test, y_test = emnist.load_testing()
     if args.verbose:
         print("...finished.")
-
-    # Split test data into training data and evaluation data
-    if args.verbose:
-        print("Split data: training and test(eval).....", end="")
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state=111)
-    if args.verbose:
-        print("...finished.")
-    #print("\tTraining Shape:", y_train.shape)
-    #print("\tTesting Shape:", y_test.shape)
 
     # Restructuring data (batch, steps, channels)
     if args.verbose:
         print("Restructuring data...", end="")
     input_shape = None
     if K.image_data_format() == 'channels_first':
-        X_train = X_train.reshape(X_train.shape[0], 1, img_rows, img_cols)
         X_test = X_test.reshape(X_test.shape[0], 1, img_rows, img_cols)
         input_shape = (1, img_rows, img_cols)
         if args.verbose:
             print("...Channels first...", end="")
     else:
-        X_train = X_train.reshape(X_train.shape[0], img_rows, img_cols, 1)
         X_test = X_test.reshape(X_test.shape[0], img_rows, img_cols, 1)
         input_shape = (img_rows, img_cols, 1)
         if args.verbose:
             print("...Channels last...", end="")
 
     # Change pixel information type
-    X_train = X_train.astype('float32')
     X_test = X_test.astype('float32')
 
     # Remap [0,255] image values to [0,1]
-    X_train /= 255
     X_test /= 255
 
     # Convert class vectors to binary class matrices
-    y_train = keras.utils.to_categorical(y_train, num_classes)
     y_test = keras.utils.to_categorical(y_test, num_classes)
     if args.verbose:
         print("...finished.")
@@ -110,8 +96,6 @@ def test_model(model):
         print("...finished.")
 
     # Evaluate the model using Accuracy and Loss
-    # score : ['loss', 'output_1_loss', 'output_2_loss',
-    # 'output_1_mean_absolute_error', 'output_2_mean_absolute_error']
     if args.verbose:
         print("Evaluating model........................", end="")
     score = model.evaluate(X_test, y_test, verbose=0)
@@ -132,14 +116,8 @@ def plot_model():
     # Load training history
     if args.verbose:
         print("Loading model history from disk.........", end="")
-    #with codecs.open('cnn_model_history.pckl', 'r', encoding='utf-8') as f:
-        #history = json.loads(f.read())
-    #history = new History()
-    f = open('cnn_model_history.pckl', 'rb')
+    f = open('model_saves/cnn_model_history.pckl', 'rb')
     history = pickle.load(f)
-    print(type(history))
-    print(history)
-    #print(history.history.keys())
     f.close()
     if args.verbose:
         print("...finished.")
@@ -213,12 +191,10 @@ if __name__ == "__main__":
         model = load_model()
         if args.test:
             test_model(model)
-            print(letters[int(predict_model(model, 'input_images/img-7.png'))])
-        #if args.input:
+        if args.input:
             # [0-9: digits][10-36: uppercase][37-62: lowercase
-            #prediction = predict_model(model, args.input[0])
-            #print(prediction)
-            #print(letters[int(prediction)])
+            prediction = predict_model(model, 'input_images/img-7.png')
+            print("Prediction: ", prediction, " --> ", letters[int(prediction)])
     
 
 

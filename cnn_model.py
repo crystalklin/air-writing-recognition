@@ -7,25 +7,15 @@ from keras import backend as K
 from mnist import MNIST     # to load emnist data
 from sklearn.model_selection import train_test_split # splitting data
 import pickle               # saving training history
-import matplotlib.pyplot as plt # plotting the history
 import argparse             # handle argument flags
 
 # Set commandline flags
 parser = argparse.ArgumentParser()
 parser.add_argument("-v", "--verbose", help="increase output verbosity", 
     action="store_true")
-parser.add_argument("-p", "--plot", help="plot training accuracy and loss",
-    action="store_true")
-parser.add_argument("-t", "--test", help="run model on test data",
-    action="store_true")
-
 args = parser.parse_args()
 if args.verbose:
     print("Turned on: verbosity")
-if args.plot:
-    print("Turned on: plot")
-if args.test:
-    print("Turned on: test")
 
 # Setting variables
 if args.verbose:
@@ -135,7 +125,6 @@ history = model.fit(X_train, y_train,
             validation_data=(X_test, y_test))
 if args.verbose:
     print("...finished.")
-#print(history.history)
 
 # Save trained model
 if args.verbose:
@@ -143,45 +132,17 @@ if args.verbose:
 
 # Save model in JSON format
 model_json = model.to_json()
-with open("cnn_model.json", "w") as json_file:
+with open("model_saves/cnn_model.json", "w") as json_file:
     json_file.write(model_json)
 
 # Save model weights
-model.save('cnn_model_weights.h5')
+model.save('model_saves/cnn_model_weights.h5')
 
 # Save training history
-f = open('cnn_model_history.pckl', 'wb')
+f = open('model_saves/cnn_model_history.pckl', 'wb')
 pickle.dump(history.history, f)
 f.close()
 if args.verbose:
     print("...finished.")
 
-if args.plot:
-    # summarize history for accuracy
-    plt.plot(history.history['acc'])
-    plt.plot(history.history['val_acc'])
-    plt.title('model accuracy')
-    plt.ylabel('accuracy')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
-
-    # summarize history for loss
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.title('model loss')
-    plt.ylabel('loss')
-    plt.xlabel('epoch')
-    plt.legend(['train', 'test'], loc='upper left')
-    plt.show()
-
-if args.test:
-    # Evaluate the model using Accuracy and Loss
-    if args.verbose:
-        print("Evaluating model........................", end="")
-    score = model.evaluate(X_test, y_test, verbose=0)
-    if args.verbose:
-        print("...finished.")
-    print('Test loss:', score[0])
-    print('Test accuracy:', score[1])
 
