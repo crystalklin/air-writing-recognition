@@ -47,13 +47,13 @@ def load_model():
     #    print("Loading cnn model from disk.............", end="")
 
     # Load JSON model
-    json_file = open('cnn_model-0.json', 'r')
+    json_file = open('model_saves/cnn_model.json', 'r')
     model_json = json_file.read()
     json_file.close()
     model = model_from_json(model_json)
 
     # Load model weights
-    model.load_weights("cnn_model_weights-0.h5")
+    model.load_weights("model_saves/cnn_model_weights.h5")
     #if args.verbose:
     #    print("...finished.")
     return model
