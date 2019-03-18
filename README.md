@@ -9,45 +9,81 @@ To us, air gesture recognition is an interesting topic to create a solution for 
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### Prerequisites
+### Environment
 
 Python Version 3.7.x<br>
 Packages:
-* OpenCV
+* OpenCV 3.4.2
 * imutils
+* Tensorflow
+* Keras
 * numpy
-* scikit-image
-
+* scikit-learn
+* matplotlib
 
 ```
-pip install opencv-python
+pip install opencv-python==3.4.2.16
 pip install imutils
+pip install tensorflow
+pip install keras
 pip install numpy
-pip install scikit-image
+pip install scikit-learn
+pip install matplotlib
 ```
 
-<!-- ### Installation
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
+### Project Code
+You'll need to download the project repsository from GitHub:
 ```
-Give the example
+https://github.com/heycrystal/air-writing-recognition
 ```
 
-And repeat
+### Dataset
+
+Download EMNIST Dataset at this address:
 
 ```
-until finished
+http://www.itl.nist.gov/iaui/vip/cs_links/EMNIST/gzip.zip
 ```
+The extract the following put them in a folder named 'data'
+* emnist-byclass-test-images-idx3-ubyte.gz
+* emnist-byclass-test-labels-idx1-ubyte.gz
+* emnist-byclass-train-images-idx3-ubyte.gz
+* emnist-byclass-train-labels-idx1-ubyte.gz
 
-End with an example of getting some data out of the system or using it for a little demo
 
 ## Ready, set, run!
+Our project can be run by training an new CNN entirely, or just with a presaved model. If you would like to just run the program without training a new model, feel free to skip to step 2.
 
-Explain how to run the automated tests for this system -->
+###1. Training the classifier
+To train the network you're going to need to run the file cnn_model_test.py. The program will create files cnn_model.json, cnn_model_weights.h5, and cnn_model_history.pckl. Using the "-v" or "--verbose" flag will show status print statements. Training takes us just under 30 minutes an epoch (total \~5 hours).
 
+Note: The new model files will overwrite the old ones of the same name, so save the old ones under a different name if you'd like to keep them.
+```
+python cnn_model.py
+```
+
+###2. Plotting the classification history
+To test and plot the saved model you will use the cnn_model_test.py file.
+To plot the saved model accuracies and loss percentages during training, run:
+```
+python cnn_model_test.py -p
+```
+To test the saved model on the testing data from EMNIST, run:
+```
+python cnn_model_test.py -t
+```
+Once again, you may use the "-v" or "--verbose" flag to show status print statements.
+
+###3. Running the program
+To run the program you will need to run the air_writing_recognition.py program.
+```
+python air_writing_recognition.py
+```
+After running the program, two windows will pop up-- a webcam live feed and a black and white bitmask feed. (These two windows may be ontop of each other.) You will need a lime green object to track. <br>
+
+To set the whiteboard depth, hit the "s" key. To write, simply start your letter and make lift your pen from the whiteboard between each stroke (increase the distance from the camera). To save the character, hit the "d" key. You may save multiple images in one session.
+
+Note: During keypresses, you must be focused on the life feed window, _not_ the terminal window.
 
 ## Built With
 
@@ -62,9 +98,4 @@ Explain how to run the automated tests for this system -->
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
-<!-- ## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc -->
 
