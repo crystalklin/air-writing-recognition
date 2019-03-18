@@ -54,7 +54,7 @@ The extract the following put them in a folder named 'data'
 ## Ready, set, run!
 Our project can be run by training an new CNN entirely, or just with a presaved model. If you would like to just run the program without training a new model, feel free to skip to step 2.
 
-###1. Training the classifier
+### 1. Training the classifier
 To train the network you're going to need to run the file cnn_model_test.py. The program will create files cnn_model.json, cnn_model_weights.h5, and cnn_model_history.pckl. Using the "-v" or "--verbose" flag will show status print statements. Training takes us just under 30 minutes an epoch (total \~5 hours).
 
 Note: The new model files will overwrite the old ones of the same name, so save the old ones under a different name if you'd like to keep them.
@@ -62,7 +62,7 @@ Note: The new model files will overwrite the old ones of the same name, so save 
 python cnn_model.py
 ```
 
-###2. Plotting the classification history
+### 2. Plotting the classification history
 To test and plot the saved model you will use the cnn_model_test.py file.
 To plot the saved model accuracies and loss percentages during training, run:
 ```
@@ -74,7 +74,7 @@ python cnn_model_test.py -t
 ```
 Once again, you may use the "-v" or "--verbose" flag to show status print statements.
 
-###3. Running the program
+### 3. Running the program
 To run the program you will need to run the air_writing_recognition.py program.
 ```
 python air_writing_recognition.py
