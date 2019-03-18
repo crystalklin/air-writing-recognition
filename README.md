@@ -1,6 +1,6 @@
 # Air Writing Recognition
 
-Our project, Air Gesture Recognition, aims to use a combination of computer vision and handwriting recognition to create model that recognizes gestures written in air as text. Model users would be able to write “air words” facing a web-camera either real time or in-advance and have those gestures translated into character digits or words. 
+Our project, Air Gesture Recognition, aims to use a combination of computer vision and handwriting recognition to create model that recognizes gestures written in air as text. Model users would be able to write “air words” facing a web-camera either real time or in-advance and have those gestures translated into letters or digits. 
 
 To us, air gesture recognition is an interesting topic to create a solution for because it lends itself to many different future uses. Most intuitively, air gesture analysis allows for users with specific needs alternative forms of communication. This idea could also be extrapolated into using air gestures as a more universal input interface for technologies that are unsuited for the traditional keyboard and mouse (such as AR and VR systems).
 
@@ -81,13 +81,16 @@ python air_writing_recognition.py
 ```
 After running the program, two windows will pop up-- a webcam live feed and a black and white bitmask feed. (These two windows may be ontop of each other.) You will need a lime green object to track. <br>
 
-To set the whiteboard depth, hit the "s" key. To write, simply start your letter and make lift your pen from the whiteboard between each stroke (increase the distance from the camera). To save the character, hit the "d" key. You may save multiple images in one session.
+To set the whiteboard depth, hit the "s" key. To write, simply start your letter and make lift your pen from the whiteboard between each stroke (increase the distance from the camera). To save the character, hit the "d" key. You may save multiple images in one session. To exit the program, press the "q" key.
 
 Note: During keypresses, you must be focused on the life feed window, _not_ the terminal window.
 
 ## Built With
 
-* [OpenCV](http://www.opencv.com) - The computer vision library used
+* [OpenCV](http://www.opencv.com) - The computer vision library used.
+* [Keras](https://keras.io/) - The high-level neural networks API used.
+* [Tensorflow](https://www.tensorflow.org/) - Machine learning source platform used.
+* [EMNIST](https://arxiv.org/pdf/1702.05373.pdf) - The dataset the CNN was trained on.
 
 ## Authors
 
